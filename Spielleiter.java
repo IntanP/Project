@@ -1,17 +1,16 @@
 package VierGewinnt;
 
-import java.util.Scanner;
-
 //Zwei Spieler : Player 1(X) und Player 2(O)
 
-public class VierGewinnt {
-
+public class Spielleiter {
 	private int feld[][];
 
-	public VierGewinnt() {
+	private Spieler p1 = new Menschspieler(1);
+	private Spieler p2 = new EinfacherComputerspieler(2);
+	Spielfeld sf = new Spielfeld();
 
+	public Spielleiter() {
 		feld = new int[6][7];
-
 		for (int i = 0; i < 6; i++) {
 			for (int j = 0; j < 7; j++) {
 				feld[i][j] = 0;
@@ -19,11 +18,14 @@ public class VierGewinnt {
 		}
 	}
 
-	public void frageUndSetze(int spielerNr) {
-		boolean beendet = false;
+	public Spieler getSpieler(int spielerNr) {
+		return ((spielerNr == 1) ? p1 : p2);
+	}
 
+	public void frageUndSetze(int spielerNr, Spieler p) {
+		boolean beendet = false;
 		do {
-			int spalte = frageSpielerNachSpalte(spielerNr);
+			int spalte = p.frageSpielerNachSpalte(sf);
 			beendet = setze(spielerNr, spalte);
 			if (!beendet) {
 				System.out.println("Bitte andere Spalte eingeben");
@@ -42,17 +44,10 @@ public class VierGewinnt {
 		return false;
 	}
 
-	public int frageSpielerNachSpalte(int spielerNr) {
-		System.out.println("Spieler " + spielerNr + " Bitte Spalte(0-6)eingeben");
-		Scanner s = new Scanner(System.in);
-		int spalte = s.nextInt();
-		return spalte;
-	}
-
 	public void ausgabeSpielfeld() {
-		char[][] array = new char[6][7];
-		for (int i = 0; i < 6; i++) {
-			for (int j = 0; j < 7; j++) {
+		char[][] array = new char[feld.length][feld[0].length];
+		for (int i = 0; i < feld.length; i++) {
+			for (int j = 0; j < feld[0].length; j++) {
 				if (feld[i][j] == 1) {
 					array[i][j] = 'X';
 				} else if (feld[i][j] == 2) {
@@ -64,8 +59,11 @@ public class VierGewinnt {
 			}
 			System.out.println();
 		}
-		System.out.println();
 
+		for (int x = 1; x <= feld[0].length; x++) {
+			System.out.print(" (" + x + ") ");
+		}
+		System.out.println();
 	}
 
 	/**
@@ -73,7 +71,7 @@ public class VierGewinnt {
 	 */
 	public int getAnzahlErsterZeile() {
 		int anzSteine = 0;
-		for (int j = 0; j < 6; j++) {
+		for (int j = 0; j < feld.length; j++) {
 			if (feld[0][j] != 0) {
 				anzSteine++;
 			}
@@ -84,25 +82,25 @@ public class VierGewinnt {
 	/**
 	 * Ganzes Spiel steuern
 	 */
-
 	public void spiele() {
 		ausgabeSpielfeld();
 		do {
 			System.out.println();
-			frageUndSetze(1);
+			frageUndSetze(1, p1);
 			ausgabeSpielfeld();
 			if (teste(1)) {
 				break;
 			}
-			frageUndSetze(2);
+			frageUndSetze(2, p2);
 			ausgabeSpielfeld();
-		} while (teste(1) != true && teste(2) != true && !unentschieden());
+		} while (!teste(1) && !teste(2) && !unentschieden());
+		System.out.println();
 
 		if (teste(1)) {
-			System.out.println("Player 1 hat gewonnen");
+			System.out.println(p1.getName() + " hat gewonnen");
 		} else if (teste(2)) {
-			System.out.println("Player 2 hat gewonnen");
-		} else if (unentschieden()) {
+			System.out.println(p2.getName() + " hat gewonnen");
+		} else {
 			System.out.println("unentschieden!");
 		}
 	}
@@ -121,8 +119,8 @@ public class VierGewinnt {
 		boolean returnwert = false;
 
 		if (getAnzahlErsterZeile() <= feld.length) {
-			for (int i = 0; i < 6; i++) {
-				for (int j = 0; j < 7; j++) {
+			for (int i = 0; i < feld.length; i++) {
+				for (int j = 0; j < feld[0].length; j++) {
 					if (testeHorizontal(i, j, spielerNr) || testeVertikal(i, j, spielerNr)
 							|| testeDiagonal(i, j, spielerNr)) {
 						returnwert = true;
@@ -137,22 +135,22 @@ public class VierGewinnt {
 	/**
 	 * 3 Methode, die von einem Punkt testen, ob die Spieler gewinnen.
 	 */
-	public boolean testeHorizontal(int x, int y, int Spieler) {
-		return (y + 3 < feld[x].length && feld[x][y] == Spieler && feld[x][y + 1] == Spieler
-				&& feld[x][y + 2] == Spieler && feld[x][y + 3] == Spieler);
+	public boolean testeHorizontal(int x, int y, int spielerNr) {
+		return (y + 3 < feld[x].length && feld[x][y] == spielerNr && feld[x][y + 1] == spielerNr
+				&& feld[x][y + 2] == spielerNr && feld[x][y + 3] == spielerNr);
 	}
 
-	public boolean testeVertikal(int x, int y, int Spieler) {
-		return x + 3 < feld.length && feld[x][y] == Spieler && feld[x + 1][y] == Spieler && feld[x + 2][y] == Spieler
-				&& feld[x + 3][y] == Spieler;
+	public boolean testeVertikal(int x, int y, int spielerNr) {
+		return x + 3 < feld.length && feld[x][y] == spielerNr && feld[x + 1][y] == spielerNr
+				&& feld[x + 2][y] == spielerNr && feld[x + 3][y] == spielerNr;
 	}
 
-	public boolean testeDiagonal(int x, int y, int Spieler) {
-
-		return (x + 3 < feld.length && y + 3 < feld[x].length && feld[x][y] == Spieler && feld[x + 1][y + 1] == Spieler
-				&& feld[x + 2][y + 2] == Spieler && feld[x + 3][y + 3] == Spieler)
-				|| (x - 3 >= 0 && y + 3 < feld[x].length && feld[x][y] == Spieler && feld[x - 1][y + 1] == Spieler
-						&& feld[x - 2][y + 2] == Spieler && feld[x - 3][y + 3] == Spieler);
+	public boolean testeDiagonal(int x, int y, int spielerNr) {
+		return (x + 3 < feld.length && y + 3 < feld[x].length && feld[x][y] == spielerNr
+				&& feld[x + 1][y + 1] == spielerNr && feld[x + 2][y + 2] == spielerNr
+				&& feld[x + 3][y + 3] == spielerNr)
+				|| (x - 3 >= 0 && y + 3 < feld[x].length && feld[x][y] == spielerNr && feld[x - 1][y + 1] == spielerNr
+						&& feld[x - 2][y + 2] == spielerNr && feld[x - 3][y + 3] == spielerNr);
 
 	}
 }

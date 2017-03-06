@@ -2,7 +2,7 @@ package VierGewinnt;
 
 public class VierGewinntTest {
 	public static void main(String[] args) {
-		VierGewinnt vg = new VierGewinnt();
+		Spielleiter vg = new Spielleiter();
 		vg.spiele();
 	}
 }
