@@ -5,7 +5,6 @@ import java.util.Random;
 public class KlugerComputerspieler implements Spieler {
 	private Random r = new Random();
 	private int spielerNr;
-	Spielfeld sf = new Spielfeld();
 
 	public KlugerComputerspieler(int spielerNr) {
 		this.spielerNr = spielerNr;
@@ -19,8 +18,8 @@ public class KlugerComputerspieler implements Spieler {
 		System.out.println();
 		System.out.println("kluger PC ist dran");
 		int wahl = r.nextInt(7);
-		int beste1 = besteWahl(1);
-		int beste2 = besteWahl(2);
+		int beste1 = besteWahl(sf, 1);
+		int beste2 = besteWahl(sf, 2);
 		if (beste1 != 0) {
 			return beste1;
 		} else if (beste2 != 0) {
@@ -30,7 +29,7 @@ public class KlugerComputerspieler implements Spieler {
 
 	}
 
-	public int besteWahl(int x) {
+	public int besteWahl(Spielfeld sf, int x) {
 		for (int i = 0; i < 7; i++) {
 			Spielfeld sf2 = new Spielfeld(sf); //Kopie von Original
 			sf2.setze(x, i);
